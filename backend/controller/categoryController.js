@@ -4,17 +4,20 @@ const Category = require('../model/Category');
 // create category
 const createCategory = async (req, res) => {
     try {
-        const { title, image } = req.body;
+        const { title } = req.body;
 
         // Validate input
-        if (!title || !image){
+        if (!title || !req.file){
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
 
-        const category = await Category.create({ title, image })
+        const category = await Category.create({
+            title: title.trim(),
+            image: `/uploads/${req.file.filename}`
+        });
 
         return res.status(201).json({
             success: true,
@@ -22,7 +25,7 @@ const createCategory = async (req, res) => {
             message: "Successfully created category"
         })
     } catch (err) {
-        console.log("Erorr creating category: ", err);
+        console.log("Error creating category: ", err);
         return res.status(500).json({
             success: false,
             message: "Internal server error"
@@ -33,7 +36,7 @@ const createCategory = async (req, res) => {
 // list all category
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.find()
+        const categories = await Category.find();
 
         return res.status(200).json({
             success: true,
@@ -45,8 +48,8 @@ const getAllCategories = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Internal server error"
-        })
+        });
     }
-}
+};
 
 module.exports = { getAllCategories, createCategory };

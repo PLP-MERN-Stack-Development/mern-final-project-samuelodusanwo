@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const validator = require('validator')
+const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -65,7 +66,7 @@ userSchema.statics.login = async function(email, password) {
 
     // email validator
     if (!validator.isEmail(email)) {
-        throw new Error('Please put a valid email')
+        throw new Error('Please put a valid email address')
     }
 
     // check if user exist in db

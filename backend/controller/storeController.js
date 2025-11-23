@@ -1,22 +1,32 @@
+const mongoose = require('mongoose');
 const Store = require('../model/Store');
 
 
 // Create store
 const createStore = async (req, res) => {
     try {
-        const { name, logo, phone_number, user } = req.body;
+        const { name, phone_number, user } = req.body;
 
         // Validate input
-        if (!name || !logo || !phone_number || !user) {
+        if (!name || !req.file || !phone_number || !user) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
 
+        // validate id
+        if (!mongoose.Types.ObjectId(user)) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid user id"
+            })
+        }
+
+        // Create user
         const store = await Store.create({
             name: name.trim(),
-            logo,
+            logo: `/uploads/${req.file.filename}`,
             phone_number,
             user
         })
@@ -55,4 +65,4 @@ const getAllStore = async (req, res) => {
 }
 
 
-module.exports = { createStore }
+module.exports = { createStore, getAllStore }

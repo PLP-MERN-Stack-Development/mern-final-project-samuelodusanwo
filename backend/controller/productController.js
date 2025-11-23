@@ -1,13 +1,14 @@
+const mongoose = require('mongoose');
 const Product = require('../model/Product');
 
 
 // Create Products
 const createProduct = async (req, res) => {
     try {
-        const { name, description, image, price, store, category, user } = req.body;
+        const { name, description, price, store, category, user } = req.body;
 
         // Validate inputs
-        if (!name || !description || !image || !price || !store || !category || !user) {
+        if (!name || !description || !req.file || !price || !store || !category || !user) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -25,7 +26,7 @@ const createProduct = async (req, res) => {
         const product = await Product.create({
             name: name.trim(),
             description: description.trim(),
-            image,
+            image: `/uploads/${req.file.filename}`,
             price: Number(price),
             store,
             category,
@@ -49,7 +50,7 @@ const createProduct = async (req, res) => {
 // Retreive all products
 const getAllProducts = async (req, res) => {
     try {
-        const { store, category, page = 1, limit = 10 } = res.query;
+        const { store, category, page = 1, limit = 10 } = req.query;
 
         const filter = {}
         if (store) filter.store();
@@ -82,4 +83,66 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, createProduct }
+// Products by category
+const productsByCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate id
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid category id"
+            })
+        }
+
+        const product = await Product.find({ category: id })
+
+        return res.status(200).json({
+            success: true,
+            data: product,
+            count: product.length,
+            message: "Succesfully fetched products by category"
+        })
+
+    } catch(err) {
+        console.log('Error fetching products by category: ', err)
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+// products by shop
+const productsByStore = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate id
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid store id"
+            })
+        }
+
+        const product = await Product.find({ store: id })
+
+        return res.status(200).json({
+            success: true,
+            data: product,
+            count: product.length,
+            message: "Succesfully fetched products by store"
+        })
+
+    } catch(err) {
+        console.log('Error fetching products by store: ', err)
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+module.exports = { getAllProducts, createProduct, productsByCategory, productsByStore }
