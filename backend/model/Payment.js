@@ -7,11 +7,11 @@ const paymentSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    quantity: {
-        type: Number,
-        required: true,
-        min: 1
-    },
+    // quantity: {
+    //     type: Number,
+    //     required: true,
+    //     min: 1
+    // },
     total_price: {
         type: Number,
         required: true,

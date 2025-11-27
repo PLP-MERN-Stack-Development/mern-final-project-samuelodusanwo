@@ -3,10 +3,11 @@ const Payment = require('../model/Payment');
 
 const createPayment = async (req, res) => {
     try {
-        const { quantity, total_price, user } = req.body;
+        const { total_price } = req.body;
+        console.log("incoming: ", req.body)
         
         // Validate input
-        if (!quantity || !total_price || !user) {
+        if (!total_price) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -14,8 +15,8 @@ const createPayment = async (req, res) => {
         }
 
         const receipt = await Payment({
-            user,
-            quantity,
+            user: req.userId,
+            // quantity,
             total_price
         })
 

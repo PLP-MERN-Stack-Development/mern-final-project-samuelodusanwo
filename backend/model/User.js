@@ -58,22 +58,17 @@ userSchema.statics.signup = async function(name, email, password) {
 }
 
 // login
-userSchema.statics.login = async function(email, password) {
+userSchema.statics.login = async function(name, password) {
     // Validate input
-    if (!email || !password) {
+    if (!name || !password) {
         throw new Error('All fields are required')
     };
 
-    // email validator
-    if (!validator.isEmail(email)) {
-        throw new Error('Please put a valid email address')
-    }
-
     // check if user exist in db
-    const user = await this.findOne({email});
+    const user = await this.findOne({name});
 
     if (!user) {
-        throw new Error("Email doesn't exist")
+        throw new Error("Name doesn't exist")
     };
 
     // validate password

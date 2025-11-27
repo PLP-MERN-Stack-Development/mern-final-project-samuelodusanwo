@@ -5,30 +5,22 @@ const Store = require('../model/Store');
 // Create store
 const createStore = async (req, res) => {
     try {
-        const { name, phone_number, user } = req.body;
+        const { name, phone_number } = req.body;
 
         // Validate input
-        if (!name || !req.file || !phone_number || !user) {
+        if (!name || !req.files || !phone_number) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
 
-        // validate id
-        if (!mongoose.Types.ObjectId(user)) {
-            return res.status(400).json({
-                success: false,
-                error: "Invalid user id"
-            })
-        }
-
         // Create user
         const store = await Store.create({
             name: name.trim(),
-            logo: `/uploads/${req.file.filename}`,
+            logo: `/uploads/${req.files[0].filename}`,
             phone_number,
-            user
+            user: req.userId
         })
 
         return res.status(201).json({
@@ -50,7 +42,7 @@ const getAllStore = async (req, res) => {
     try {
         const store = await Store.find().sort({ createdAt: -1 })
 
-        return res.staus(200).json({
+        return res.status(200).json({
             success: true,
             data: store,
             message: "Successfully retreiving all store"
@@ -64,5 +56,33 @@ const getAllStore = async (req, res) => {
     }
 }
 
+// get personal store
+const myStore = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-module.exports = { createStore, getAllStore }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid id"
+            })
+        }
+
+        const stores = await Store.find({user: id});
+
+        return res.status(200).json({
+            success: true,
+            data: stores,
+            message: "Successfully retreiving all personal store"
+        })
+    } catch (err) {
+        console.log("Error getting personal stores: ", err)
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+
+module.exports = { createStore, getAllStore, myStore }

@@ -5,14 +5,34 @@ const Product = require('../model/Product');
 // Create Products
 const createProduct = async (req, res) => {
     try {
-        const { name, description, price, store, category, user } = req.body;
+        const { name, description, price, shop, category } = req.body;
+        console.log("name: ", name)
+        console.log("description: ", description)
+        console.log("price: ", price)
+        console.log("store: ", shop)
+        console.log("category: ", category)
 
         // Validate inputs
-        if (!name || !description || !req.file || !price || !store || !category || !user) {
+        if (!name || !description || !price || !shop || !category) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
+        }
+
+        // validate each ID separately
+        if (!mongoose.Types.ObjectId.isValid(shop)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid store ID"
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(category)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid category ID"
+            });
         }
 
         // Check if price is integer
@@ -26,11 +46,11 @@ const createProduct = async (req, res) => {
         const product = await Product.create({
             name: name.trim(),
             description: description.trim(),
-            image: `/uploads/${req.file.filename}`,
+            image: `/uploads/${req.files[0].filename}`,
             price: Number(price),
-            store,
+            store: shop,
             category,
-            user
+            user: req.userId
         });
 
         return res.status(201).json({

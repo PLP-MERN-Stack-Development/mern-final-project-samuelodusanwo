@@ -7,16 +7,22 @@ const createCategory = async (req, res) => {
         const { title } = req.body;
 
         // Validate input
-        if (!title || !req.file){
+        if (!title || !req.files || req.files.length === 0 ){
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
 
+        const uploadedFile = req.files[0]
+
+        console.log("datas: ", title)
+        console.log("datas: ", uploadedFile)
+
         const category = await Category.create({
             title: title.trim(),
-            image: `/uploads/${req.file.filename}`
+            title: title,
+            image: `/uploads/${uploadedFile.filename}`
         });
 
         return res.status(201).json({
@@ -44,7 +50,29 @@ const getAllCategories = async (req, res) => {
             message: "Successfully retrieved categories"
         })
     } catch (err) {
-        console.log("Error getting all category: ", err)
+        console.log("Error getting all category: ", err.message)
+
+        if (err.message === "All fields are required") {
+            return res.status(400).json({
+                success: false,
+                message: err.message
+            })
+        }
+
+        if (err.message === "Name doesn't exist") {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid username"
+            })
+        }
+
+        if (err.message === "Incorrect password") {
+            return res.status(401).json({
+                success: false,
+                message: "Incorrect password"
+            })
+        }
+
         return res.status(500).json({
             success: false,
             message: "Internal server error"

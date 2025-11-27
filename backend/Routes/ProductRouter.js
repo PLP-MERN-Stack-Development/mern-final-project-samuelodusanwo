@@ -6,15 +6,16 @@ const requireAuth = require('../middleware/requireAuth');
 
 
 // get all products
-router.get('/collections', requireAuth, getAllProducts);
+router.get('/collections', getAllProducts);
 
 // create product
-router.post('/create', requireAuth, upload.single('image'), createProduct);
+// router.post('/create', requireAuth, upload.single('image'), createProduct);
+router.post('/create', requireAuth, upload, createProduct);
 
 // products by category
-router.get('/category/:id', requireAuth, productsByCategory);
+router.get('/category/:id', productsByCategory);
 
 // products by shop
-router.get('/productByShop/:id', requireAuth, productsByStore);
+router.get('/productByShop/:id', productsByStore);
 
 module.exports = router;

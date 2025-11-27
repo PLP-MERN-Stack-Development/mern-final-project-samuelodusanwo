@@ -6,9 +6,10 @@ const { getAllCategories, createCategory } = require('../controller/categoryCont
 
 
 // get categories
-router.get('/', requireAuth, getAllCategories);
+router.get('/', getAllCategories);
 
 // create categories
-router.post('/create-category', requireAuth, upload.single('image'), createCategory);
+// router.post('/create-category', requireAuth, upload.single("image"), createCategory);
+router.post('/create-category', requireAuth, upload, createCategory);
 
 module.exports = router;
